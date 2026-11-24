@@ -1,0 +1,2066 @@
+{
+  "info": {
+    "_postman_id": "b4d3109d-23dc-4b62-9ab8-65d70303229e",
+    "name": "BiblioFlow API",
+    "description": "Pruebas de la API de BiblioFlow (gestión de préstamos de biblioteca). API en Spring Boot + MongoDB (puerto 8080). Ejecutar las carpetas en orden con el Runner. Cada corrida crea sus propios libros y socio, así que se puede repetir sin volver a sembrar la base.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Salud",
+      "item": [
+        {
+          "name": "Salud del servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado OK', () => pm.expect(pm.response.json().estado).to.eql('OK'));",
+                  "pm.test('Responde rápido', () => pm.expect(pm.response.responseTime).to.be.below(1000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/salud",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salud"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Libros",
+      "item": [
+        {
+          "name": "Listar libros",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filtrar libros por categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todos son INGENIERIA', () => pm.response.json().forEach(l => pm.expect(l.categoria).to.eql('INGENIERIA')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros?categoria=INGENIERIA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ],
+              "query": [
+                {
+                  "key": "categoria",
+                  "value": "INGENIERIA"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar libros por texto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros?q=Clean",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Clean"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar libro A",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const n = String(Date.now()).slice(-9) + Math.floor(Math.random()*9);",
+                  "pm.collectionVariables.set('libroAIsbn', '978-' + n);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Libro creado DISPONIBLE', () => pm.expect(b.estado).to.eql('DISPONIBLE'));",
+                  "pm.collectionVariables.set('libroA', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"{{libroAIsbn}}\",\n  \"titulo\": \"Refactoring\",\n  \"autor\": \"Martin Fowler\",\n  \"categoria\": \"INGENIERIA\",\n  \"anioPublicacion\": 2020\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar libro B",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const n = String(Date.now()).slice(-9) + Math.floor(Math.random()*9);",
+                  "pm.collectionVariables.set('libroBIsbn', '978-' + n);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Libro creado DISPONIBLE', () => pm.expect(b.estado).to.eql('DISPONIBLE'));",
+                  "pm.collectionVariables.set('libroB', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"{{libroBIsbn}}\",\n  \"titulo\": \"The Pragmatic Programmer\",\n  \"autor\": \"Hunt y Thomas\",\n  \"categoria\": \"INGENIERIA\",\n  \"anioPublicacion\": 2020\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar libro C",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const n = String(Date.now()).slice(-9) + Math.floor(Math.random()*9);",
+                  "pm.collectionVariables.set('libroCIsbn', '978-' + n);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Libro creado DISPONIBLE', () => pm.expect(b.estado).to.eql('DISPONIBLE'));",
+                  "pm.collectionVariables.set('libroC', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"{{libroCIsbn}}\",\n  \"titulo\": \"Rayuela\",\n  \"autor\": \"Julio Cortázar\",\n  \"categoria\": \"LITERATURA\",\n  \"anioPublicacion\": 2020\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar libro D",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const n = String(Date.now()).slice(-9) + Math.floor(Math.random()*9);",
+                  "pm.collectionVariables.set('libroDIsbn', '978-' + n);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Libro creado DISPONIBLE', () => pm.expect(b.estado).to.eql('DISPONIBLE'));",
+                  "pm.collectionVariables.set('libroD', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"{{libroDIsbn}}\",\n  \"titulo\": \"Cosmos\",\n  \"autor\": \"Carl Sagan\",\n  \"categoria\": \"CIENCIAS\",\n  \"anioPublicacion\": 2020\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - ISBN duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código ISBN_DUPLICADO', () => pm.expect(pm.response.json().codigo).to.eql('ISBN_DUPLICADO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"{{libroAIsbn}}\",\n  \"titulo\": \"Copia\",\n  \"autor\": \"Alguien\",\n  \"categoria\": \"OTRO\",\n  \"anioPublicacion\": 2020\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Datos inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Código DATOS_INVALIDOS', () => pm.expect(pm.response.json().codigo).to.eql('DATOS_INVALIDOS'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 400);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"X\",\n  \"categoria\": \"COCINA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - JSON mal formado (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Código JSON_INVALIDO', () => pm.expect(pm.response.json().codigo).to.eql('JSON_INVALIDO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 400);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"titulo\": ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle libro A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Es el libro A', () => pm.expect(b.id).to.eql(pm.collectionVariables.get('libroA')));",
+                  "pm.test('Sin préstamos aún', () => pm.expect(b.totalPrestamos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{libroA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "{{libroA}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Libro inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Código LIBRO_NO_ENCONTRADO', () => pm.expect(pm.response.json().codigo).to.eql('LIBRO_NO_ENCONTRADO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 404);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "999999"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Socios",
+      "item": [
+        {
+          "name": "Registrar socio estudiante",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('socioDoc', String(Date.now()).slice(-10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Sin multa', () => pm.expect(b.multaPendiente).to.eql(0));",
+                  "pm.test('Tipo ESTUDIANTE', () => pm.expect(b.tipo).to.eql('ESTUDIANTE'));",
+                  "pm.collectionVariables.set('socioId', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/socios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documento\": \"{{socioDoc}}\",\n  \"nombre\": \"Camila Pantoja\",\n  \"correo\": \"camila.pantoja@campusucc.edu.co\",\n  \"tipo\": \"ESTUDIANTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Documento duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código DOCUMENTO_DUPLICADO', () => pm.expect(pm.response.json().codigo).to.eql('DOCUMENTO_DUPLICADO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/socios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documento\": \"{{socioDoc}}\",\n  \"nombre\": \"Camila Pantoja\",\n  \"correo\": \"camila.pantoja@campusucc.edu.co\",\n  \"tipo\": \"ESTUDIANTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Socio inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Código DATOS_INVALIDOS', () => pm.expect(pm.response.json().codigo).to.eql('DATOS_INVALIDOS'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 400);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/socios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documento\": \"12\",\n  \"nombre\": \"A\",\n  \"correo\": \"no-es-correo\",\n  \"tipo\": \"VISITANTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar socios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay socios', () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/socios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle socio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Máximo 3 préstamos (estudiante)', () => pm.expect(b.maxPrestamos).to.eql(3));",
+                  "pm.test('Sin préstamos abiertos', () => pm.expect(b.prestamosAbiertos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/socios/{{socioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios",
+                "{{socioId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Préstamos (flujo principal)",
+      "item": [
+        {
+          "name": "Prestar libro A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Préstamo ACTIVO', () => pm.expect(b.estado).to.eql('ACTIVO'));",
+                  "pm.test('Fecha límite = préstamo + 14 días (estudiante)', () => pm.expect(new Date(b.fechaLimite).toISOString()).to.eql('2026-11-15T00:00:00.000Z'));",
+                  "pm.collectionVariables.set('prestamoA', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroA}}\",\n  \"fechaPrestamo\": \"2026-11-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Libro A queda PRESTADO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado PRESTADO', () => pm.expect(pm.response.json().estado).to.eql('PRESTADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{libroA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "{{libroA}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Libro no disponible (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código LIBRO_NO_DISPONIBLE', () => pm.expect(pm.response.json().codigo).to.eql('LIBRO_NO_DISPONIBLE'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroA}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle del préstamo con historial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Incluye libro y socio', () => { pm.expect(b.libro.id).to.eql(pm.collectionVariables.get('libroA')); pm.expect(b.socio.id).to.eql(pm.collectionVariables.get('socioId')); });",
+                  "pm.test('Historial con 1 registro', () => pm.expect(b.historial).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/{{prestamoA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "{{prestamoA}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar préstamos del socio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('1 préstamo', () => pm.expect(pm.response.json()).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos?socioId={{socioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ],
+              "query": [
+                {
+                  "key": "socioId",
+                  "value": "{{socioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Devolver libro A con 5 días de retraso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Estado DEVUELTO', () => pm.expect(b.estado).to.eql('DEVUELTO'));",
+                  "pm.test('5 días de retraso', () => pm.expect(b.diasRetraso).to.eql(5));",
+                  "pm.test('Multa $5.000', () => pm.expect(b.multa).to.eql(5000));",
+                  "pm.test('Historial con 2 registros', () => pm.expect(b.historial).to.have.lengthOf(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/{{prestamoA}}/devolver",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "{{prestamoA}}",
+                "devolver"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaDevolucion\": \"2026-11-20T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Libro A vuelve a DISPONIBLE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado DISPONIBLE', () => pm.expect(pm.response.json().estado).to.eql('DISPONIBLE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{libroA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "{{libroA}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Socio queda con multa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Multa pendiente $5.000', () => pm.expect(pm.response.json().multaPendiente).to.eql(5000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/socios/{{socioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios",
+                "{{socioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Devolver dos veces (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código TRANSICION_INVALIDA', () => pm.expect(pm.response.json().codigo).to.eql('TRANSICION_INVALIDA'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/{{prestamoA}}/devolver",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "{{prestamoA}}",
+                "devolver"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Socio con multa no puede prestar (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Código SOCIO_CON_MULTA', () => pm.expect(pm.response.json().codigo).to.eql('SOCIO_CON_MULTA'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 422);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroB}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Pago con valor incorrecto (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Código VALOR_INCORRECTO', () => pm.expect(pm.response.json().codigo).to.eql('VALOR_INCORRECTO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 422);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/socios/{{socioId}}/pagar-multa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios",
+                "{{socioId}}",
+                "pagar-multa"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pagar multa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Multa en cero', () => pm.expect(pm.response.json().multaPendiente).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/socios/{{socioId}}/pagar-multa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios",
+                "{{socioId}}",
+                "pagar-multa"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Pagar sin multa (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código SIN_MULTA', () => pm.expect(pm.response.json().codigo).to.eql('SIN_MULTA'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/socios/{{socioId}}/pagar-multa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socios",
+                "{{socioId}}",
+                "pagar-multa"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Reglas de negocio",
+      "item": [
+        {
+          "name": "Prestar libro B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Préstamo ACTIVO', () => pm.expect(b.estado).to.eql('ACTIVO'));",
+                  "pm.test('Fecha límite = préstamo + 14 días (estudiante)', () => pm.expect(new Date(b.fechaLimite).toISOString()).to.eql('2026-11-15T00:00:00.000Z'));",
+                  "pm.collectionVariables.set('prestamoB', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroB}}\",\n  \"fechaPrestamo\": \"2026-11-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Prestar libro C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Préstamo ACTIVO', () => pm.expect(b.estado).to.eql('ACTIVO'));",
+                  "pm.test('Fecha límite = préstamo + 14 días (estudiante)', () => pm.expect(new Date(b.fechaLimite).toISOString()).to.eql('2026-11-15T00:00:00.000Z'));",
+                  "pm.collectionVariables.set('prestamoC', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroC}}\",\n  \"fechaPrestamo\": \"2026-11-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Prestar libro D",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Préstamo ACTIVO', () => pm.expect(b.estado).to.eql('ACTIVO'));",
+                  "pm.test('Fecha límite = préstamo + 14 días (estudiante)', () => pm.expect(new Date(b.fechaLimite).toISOString()).to.eql('2026-11-15T00:00:00.000Z'));",
+                  "pm.collectionVariables.set('prestamoD', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroD}}\",\n  \"fechaPrestamo\": \"2026-11-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Límite de 3 préstamos (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Código LIMITE_PRESTAMOS', () => pm.expect(pm.response.json().codigo).to.eql('LIMITE_PRESTAMOS'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 422);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": \"{{socioId}}\",\n  \"libroId\": \"{{libroA}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Actualizar préstamos vencidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Al menos 3 vencidos', () => pm.expect(pm.response.json().actualizados).to.be.at.least(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/actualizar-vencidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "actualizar-vencidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaCorte\": \"2026-12-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar vencidos del socio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('3 vencidos', () => pm.expect(pm.response.json()).to.have.lengthOf(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos?estado=VENCIDO&socioId={{socioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "VENCIDO"
+                },
+                {
+                  "key": "socioId",
+                  "value": "{{socioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Devolver préstamo vencido (B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('VENCIDO → DEVUELTO', () => pm.expect(b.estado).to.eql('DEVUELTO'));",
+                  "pm.test('16 días, multa $16.000', () => { pm.expect(b.diasRetraso).to.eql(16); pm.expect(b.multa).to.eql(16000); });",
+                  "pm.test('Historial ACTIVO→VENCIDO→DEVUELTO', () => pm.expect(b.historial.map(h => h.estadoNuevo)).to.eql(['ACTIVO','VENCIDO','DEVUELTO']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/{{prestamoB}}/devolver",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "{{prestamoB}}",
+                "devolver"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaDevolucion\": \"2026-12-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Fecha de devolución anterior al préstamo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Código DATOS_INVALIDOS', () => pm.expect(pm.response.json().codigo).to.eql('DATOS_INVALIDOS'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 400);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/{{prestamoC}}/devolver",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "{{prestamoC}}",
+                "devolver"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaDevolucion\": \"2020-01-01T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Eliminar libro prestado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código LIBRO_PRESTADO', () => pm.expect(pm.response.json().codigo).to.eql('LIBRO_PRESTADO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{libroC}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "{{libroC}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Eliminar libro con historial (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Código LIBRO_CON_HISTORIAL', () => pm.expect(pm.response.json().codigo).to.eql('LIBRO_CON_HISTORIAL'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 409);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{libroB}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "{{libroB}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar libro temporal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const n = String(Date.now()).slice(-9) + Math.floor(Math.random()*9);",
+                  "pm.collectionVariables.set('libroTmpIsbn', '978-' + n);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('Libro creado DISPONIBLE', () => pm.expect(b.estado).to.eql('DISPONIBLE'));",
+                  "pm.collectionVariables.set('libroTmp', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"{{libroTmpIsbn}}\",\n  \"titulo\": \"Libro de prueba\",\n  \"autor\": \"Autor Temporal\",\n  \"categoria\": \"OTRO\",\n  \"anioPublicacion\": 2020\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar libro temporal (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{libroTmp}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "libros",
+                "{{libroTmp}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Préstamo inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Código PRESTAMO_NO_ENCONTRADO', () => pm.expect(pm.response.json().codigo).to.eql('PRESTAMO_NO_ENCONTRADO'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 404);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Préstamo sin datos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Código DATOS_INVALIDOS', () => pm.expect(pm.response.json().codigo).to.eql('DATOS_INVALIDOS'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 400);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR - Filtro de estado inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Código DATOS_INVALIDOS', () => pm.expect(pm.response.json().codigo).to.eql('DATOS_INVALIDOS'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 400);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestamos?estado=PERDIDO",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestamos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "PERDIDO"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR - Ruta inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Código RUTA_NO_ENCONTRADA', () => pm.expect(pm.response.json().codigo).to.eql('RUTA_NO_ENCONTRADA'));",
+                  "pm.test('Formato de error estándar', () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b).to.have.property('statusCode', 404);",
+                  "  pm.expect(b).to.have.property('message');",
+                  "  pm.expect(b).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/no-existe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "no-existe"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "libroA",
+      "value": ""
+    },
+    {
+      "key": "libroB",
+      "value": ""
+    },
+    {
+      "key": "libroC",
+      "value": ""
+    },
+    {
+      "key": "libroD",
+      "value": ""
+    },
+    {
+      "key": "libroTmp",
+      "value": ""
+    },
+    {
+      "key": "libroAIsbn",
+      "value": ""
+    },
+    {
+      "key": "libroBIsbn",
+      "value": ""
+    },
+    {
+      "key": "libroCIsbn",
+      "value": ""
+    },
+    {
+      "key": "libroDIsbn",
+      "value": ""
+    },
+    {
+      "key": "libroTmpIsbn",
+      "value": ""
+    },
+    {
+      "key": "socioId",
+      "value": ""
+    },
+    {
+      "key": "socioDoc",
+      "value": ""
+    },
+    {
+      "key": "prestamoA",
+      "value": ""
+    },
+    {
+      "key": "prestamoB",
+      "value": ""
+    },
+    {
+      "key": "prestamoC",
+      "value": ""
+    },
+    {
+      "key": "prestamoD",
+      "value": ""
+    }
+  ]
+}
