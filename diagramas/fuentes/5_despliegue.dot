@@ -1,0 +1,13 @@
+digraph G { rankdir=LR; compound=true; nodesep=0.6; ranksep=1.3; node[fontname="Helvetica",fontsize=11]; edge[fontname="Helvetica",fontsize=10, arrowhead=none];
+ subgraph cluster_pc { label="«device»\nPC del bibliotecario"; style=filled; fillcolor="#eeeeee";
+   subgraph cluster_pm { label="«executionEnvironment»\nPostman"; fillcolor="#ffffff"; a1 [shape=note, label="«artifact»\nBiblioFlow.postman_collection.json"]; } }
+ subgraph cluster_so { label="«device»\nDispositivo del socio"; style=filled; fillcolor="#eeeeee";
+   subgraph cluster_nav { label="«executionEnvironment»\nNavegador"; fillcolor="#ffffff"; a2 [shape=note, label="«artifact»\nConsulta del socio"]; } }
+ subgraph cluster_srv { label="«device»\nServidor central"; style=filled; fillcolor="#eeeeee";
+   subgraph cluster_jvm { label="«executionEnvironment»\nJVM (Java 17)"; fillcolor="#ffffff"; a3 [shape=note, label="«artifact»\nbiblioflow-api.jar\n(Controller · Service · Repository)"]; } }
+ subgraph cluster_bd { label="«node»\nServidor BD"; style=filled; fillcolor="#eeeeee";
+   subgraph cluster_mongo { label="«executionEnvironment»\nMongoDB"; fillcolor="#ffffff"; a4 [shape=note, label="«artifact»\nbiblioflow\n(libros · socios · prestamos)"]; } }
+ a1 -> a3 [ltail=cluster_pc, lhead=cluster_srv, label="HTTP :8080 (LAN)\n1..*        1"];
+ a2 -> a3 [ltail=cluster_so, lhead=cluster_srv, label="HTTP :8080 (red UCC)\n0..*        1"];
+ a3 -> a4 [ltail=cluster_srv, lhead=cluster_bd, label="TCP :27017 (MongoDB)\n1        1"];
+}

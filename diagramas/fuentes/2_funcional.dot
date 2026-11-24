@@ -1,0 +1,14 @@
+digraph G { rankdir=LR; nodesep=0.5; ranksep=1.0; node[fontname="Helvetica",fontsize=11]; edge[fontname="Helvetica",fontsize=10, arrowhead=none];
+ node[shape=component, style=filled, fillcolor="#fff6d5"];
+ EB [label="«component»\nEstación de biblioteca"]; CS [label="«component»\nConsulta del socio"];
+ GC [label="«component»\nGestión de catálogo"]; GS [label="«component»\nGestión de socios"]; GP [label="«component»\nGestión de préstamos"];
+ BD [label="«component»\nBase de datos"];
+ node[shape=circle, label="", width=0.22, style=solid, fixedsize=true];
+ iC; iS; iP; iD;
+ node[shape=plaintext, width=0, fixedsize=false]; lC[label="ICatalogo"]; lS[label="ISocios"]; lP[label="IPrestamos"]; lD[label="IDatos"];
+ EB -> iC [arrowhead=icurve, arrowsize=1.6]; EB -> iS [arrowhead=icurve, arrowsize=1.6]; EB -> iP [arrowhead=icurve, arrowsize=1.6]; CS -> iS [arrowhead=icurve, arrowsize=1.6];
+ iC -> GC; iS -> GS; iP -> GP;
+ GC -> iD [arrowhead=icurve, arrowsize=1.6]; GS -> iD [arrowhead=icurve, arrowsize=1.6]; GP -> iD [arrowhead=icurve, arrowsize=1.6]; iD -> BD;
+ iC -> lC [style=invis]; iS -> lS [style=invis]; iP -> lP [style=invis]; iD -> lD [style=invis];
+ {rank=same; iC; lC} {rank=same; iS; lS} {rank=same; iP; lP} {rank=same; iD; lD}
+}

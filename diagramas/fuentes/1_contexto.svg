@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="760" font-family="Helvetica,Arial" font-size="15">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#333"/></marker></defs>
+<circle cx="550" cy="380" r="120" fill="#dbe9f6" stroke="#1f4e79" stroke-width="2"/>
+<text x="550" y="372" text-anchor="middle" font-size="18" font-weight="bold">Sistema de préstamos</text>
+<text x="550" y="396" text-anchor="middle" font-size="18" font-weight="bold">BiblioFlow</text>
+<rect x="445.0" y="52.0" width="210" height="56" fill="#fff6d5" stroke="#333" stroke-width="1.5"/>
+<text x="550" y="85" text-anchor="middle" font-size="16" font-weight="bold">Socio</text>
+<rect x="35.0" y="352.0" width="210" height="56" fill="#fff6d5" stroke="#333" stroke-width="1.5"/>
+<text x="140" y="385" text-anchor="middle" font-size="16" font-weight="bold">Bibliotecario</text>
+<rect x="855.0" y="352.0" width="210" height="56" fill="#fff6d5" stroke="#333" stroke-width="1.5"/>
+<text x="960" y="385" text-anchor="middle" font-size="16" font-weight="bold">Administrador del catálogo</text>
+<rect x="445.0" y="652.0" width="210" height="56" fill="#fff6d5" stroke="#333" stroke-width="1.5"/>
+<text x="550" y="685" text-anchor="middle" font-size="16" font-weight="bold">Cajero</text>
+<line x1="528" y1="108.0" x2="528" y2="262" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="572" y1="259" x2="572" y2="110.0" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="520" y="184.0" text-anchor="end" fill="#1f1f1f">Solicitud de préstamo y consulta</text>
+<text x="580" y="184.0" text-anchor="start" fill="#1f1f1f">Estado de préstamos y multa</text>
+<line x1="572" y1="652.0" x2="572" y2="498" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="528" y1="501" x2="528" y2="650.0" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="580" y="581.0" text-anchor="start" fill="#1f1f1f">Pago de multa</text>
+<text x="520" y="581.0" text-anchor="end" fill="#1f1f1f">Multas pendientes</text>
+<line x1="245.0" y1="358" x2="433" y2="358" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="429" y1="402" x2="247.0" y2="402" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="337.5" y="348" text-anchor="middle" fill="#1f1f1f">Préstamos y devoluciones</text>
+<text x="337.5" y="424" text-anchor="middle" fill="#1f1f1f">Fecha límite, retraso y multa</text>
+<line x1="855.0" y1="358" x2="667" y2="358" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="671" y1="402" x2="853.0" y2="402" stroke="#333" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="762.5" y="348" text-anchor="middle" fill="#1f1f1f">Libros nuevos y bajas</text>
+<text x="762.5" y="424" text-anchor="middle" fill="#1f1f1f">Catálogo y disponibilidad</text>
+</svg>

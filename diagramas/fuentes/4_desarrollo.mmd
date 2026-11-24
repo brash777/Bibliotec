@@ -1,0 +1,41 @@
+classDiagram
+  direction TB
+  namespace Controller {
+    class LibroController { <<RestController>> +listar(estado, categoria, q) +obtener(id) +registrar(req) +eliminar(id) }
+    class SocioController { <<RestController>> +listar() +obtener(id) +registrar(req) +pagarMulta(id, req) }
+    class PrestamoController { <<RestController>> +listar(estado, socioId, libroId) +obtener(id) +prestar(req) +devolver(id, req) +actualizarVencidos(req) }
+    class PrestamoRequest { <<DTO>> -socioId: String -libroId: String -fechaPrestamo: Instant }
+  }
+  namespace Service {
+    class LibroService { <<Service>> +registrar(req) Libro +eliminar(id) void }
+    class SocioService { <<Service>> +registrar(req) Socio +pagarMulta(id, valor) Socio }
+    class PrestamoService { <<Service>> +prestar(socioId, libroId, fecha) +devolver(id, fecha) +actualizarVencidos(fecha) }
+  }
+  namespace Repository {
+    class LibroRepository { <<interface>> +existsByIsbn(isbn) boolean }
+    class SocioRepository { <<interface>> +existsByDocumento(doc) boolean }
+    class PrestamoRepository { <<interface>> +findBySocioIdAndEstadoIn(id, estados) +findByEstado(estado) +countByLibroId(id) long }
+    class MongoRepository~T,String~ { <<interface>> +save(t) +findById(id) +findAll() +deleteById(id) }
+  }
+  namespace Model {
+    class Libro { <<Document>> }
+    class Socio { <<Document>> }
+    class Prestamo { <<Document>> }
+  }
+  LibroController --> "1" LibroService
+  SocioController --> "1" SocioService
+  PrestamoController --> "1" PrestamoService
+  PrestamoController ..> PrestamoRequest : «use»
+  LibroService --> "1" LibroRepository
+  LibroService --> "1" PrestamoRepository
+  SocioService --> "1" SocioRepository
+  SocioService --> "1" PrestamoRepository
+  PrestamoService --> "1" PrestamoRepository
+  PrestamoService --> "1" LibroRepository
+  PrestamoService --> "1" SocioRepository
+  MongoRepository <|-- LibroRepository
+  MongoRepository <|-- SocioRepository
+  MongoRepository <|-- PrestamoRepository
+  LibroRepository ..> Libro : «use»
+  SocioRepository ..> Socio : «use»
+  PrestamoRepository ..> Prestamo : «use»

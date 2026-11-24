@@ -1,0 +1,63 @@
+classDiagram
+  direction LR
+  class Socio {
+    -documento: String «único»
+    -nombre: String
+    -correo: String
+    -tipo: TipoSocio
+    -multaPendiente: int
+    +pagarMulta(valor: int) void
+  }
+  class Libro {
+    -isbn: String «único»
+    -titulo: String
+    -autor: String
+    -categoria: CategoriaLibro
+    -estado: EstadoLibro
+  }
+  class Prestamo {
+    -fechaPrestamo: Instant
+    -fechaLimite: Instant
+    -fechaDevolucion: Instant
+    -multa: int
+    -estado: EstadoPrestamo
+    +estaVencido(fechaCorte: Instant) boolean
+    +calcularMulta(fechaDevolucion: Instant) int
+  }
+  class HistorialPrestamo {
+    -estadoAnterior: EstadoPrestamo
+    -estadoNuevo: EstadoPrestamo
+    -fecha: Instant
+    -observacion: String
+  }
+  class TipoSocio {
+    <<enumeration>>
+    ESTUDIANTE
+    DOCENTE
+  }
+  class EstadoLibro {
+    <<enumeration>>
+    DISPONIBLE
+    PRESTADO
+  }
+  class EstadoPrestamo {
+    <<enumeration>>
+    ACTIVO
+    VENCIDO
+    DEVUELTO
+  }
+  class CategoriaLibro {
+    <<enumeration>>
+    INGENIERIA
+    CIENCIAS
+    LITERATURA
+    HISTORIA
+    OTRO
+  }
+  Socio "1" -- "0..*" Prestamo : solicita
+  Libro "1" -- "0..*" Prestamo : es prestado en
+  Prestamo "1" *-- "1..*" HistorialPrestamo : registra
+  Socio ..> TipoSocio
+  Libro ..> EstadoLibro
+  Libro ..> CategoriaLibro
+  Prestamo ..> EstadoPrestamo
